@@ -15,7 +15,7 @@ pandas
 python-dateutil
 pytz
 regex
-scikit-learn
+scikit-learn==1.3.2
 scipy
 six
 threadpoolctl
