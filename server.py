@@ -1,21 +1,15 @@
 from flask import Flask, request, jsonify
-import json
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
+import joblib
 from waitress import serve
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-# Load the trained model and vectorizer from JSON files
-with open("sentiment_analysis_model.json", "r") as model_file:
-    model_params = json.load(model_file)
-    classifier = MultinomialNB(alpha=model_params["alpha"], class_log_prior=model_params["class_log_prior"])
+# Load the trained model and vectorizer
+classifier = joblib.load("sentiment_analysis_model.pkl")
+vectorizer = joblib.load("vectorizer.pkl")
 
-with open("vectorizer.json", "r") as vectorizer_file:
-    vectorizer_params = json.load(vectorizer_file)
-    vectorizer = CountVectorizer(vocabulary=vectorizer_params)
 
 @app.route("/predict_sentiment", methods=["POST"])
 def predict_sentiment():
@@ -23,7 +17,7 @@ def predict_sentiment():
         data = request.get_json()
         text = data["text"]
 
-        # Preprocess the input text using the loaded vectorizer
+        # Preprocess the input text using the same vectorizer
         input_vector = vectorizer.transform([text])
 
         # Make a prediction
